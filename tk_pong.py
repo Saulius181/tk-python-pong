@@ -97,6 +97,9 @@ class game_controller(object):
 					else:
 						self.angle = random.uniform(0.5, math.pi/2)
 					
+					if i[0] < 30:
+						self.angle += math.pi
+					
 					self.canvas.data["Dir"] = {'x': math.sin(self.angle), 'y': -math.cos(self.angle)}
 	
 					self.canvas.data["Speed"] += 1
@@ -109,6 +112,9 @@ class game_controller(object):
 						self.angle = random.uniform(math.pi + 0.5, math.pi * 1.5)
 					else:
 						self.angle = random.uniform(math.pi * 1.5, math.pi * 2 - 0.5)
+					
+					if i[2] > 420:
+						self.angle += math.pi
 					
 					self.canvas.data["Dir"] = {'x': math.sin(self.angle), 'y': -math.cos(self.angle)}
 					
