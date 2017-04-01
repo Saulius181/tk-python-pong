@@ -16,8 +16,8 @@ import math
 from shapely.geometry import Polygon, Point, box
 
 FRAME_RATE = 10 # 100 frames per second 
-HEIGHT = 310
-WIDTH = 565
+#HEIGHT = 310
+#WIDTH = 565
 
 class game_controller(object):
 	def new_game(self):
@@ -31,7 +31,6 @@ class game_controller(object):
 			
 			self.canvas.data["Dir"] = {'x': math.sin(self.angle) * random.choice([-1, 1]), 'y': math.cos(self.angle) * random.choice([-1, 1])}
 			self.canvas.data["Speed"] = 3
-			self.canvas.data["xTurn"], self.canvas.data["yTurn"] = False, False
 			self.canvas.data["play"] = True
 			self.root.after(FRAME_RATE, self.moveit)
 		elif self.canvas.data["play"] == True:
@@ -103,7 +102,6 @@ class game_controller(object):
 					self.canvas.data["Dir"] = {'x': math.sin(self.angle), 'y': -math.cos(self.angle)}
 	
 					self.canvas.data["Speed"] += 1
-					self.canvas.data["xTurn"] = True
 					break
 			elif box( self.canvas.coords(self.rect2)[0], self.canvas.coords(self.rect2)[1],self.canvas.coords(self.rect2)[2],self.canvas.coords(self.rect2)[3] ).intersects(Point( self.canvas.coords(self.ball)[0] + 10, self.canvas.coords(self.ball)[1] + 10 ).buffer(10)) and self.canvas.data["Dir"]['x'] > 0:
 				if self.canvas.coords(self.rect2)[1] <  i[3] and self.canvas.coords(self.rect2)[3] > i[1]:
@@ -119,16 +117,13 @@ class game_controller(object):
 					self.canvas.data["Dir"] = {'x': math.sin(self.angle), 'y': -math.cos(self.angle)}
 					
 					self.canvas.data["Speed"] += 1
-					self.canvas.data["xTurn"] = True
 					break
 
 			elif i[1] < 10 and self.canvas.data["Dir"]['y'] < 0:
 				self.canvas.data["Dir"]['y'] *= -1
-				self.canvas.data["yTurn"] = True
 				break
 			elif i[3] > 300 and self.canvas.data["Dir"]['y'] > 0:
 				self.canvas.data["Dir"]['y'] *= -1
-				self.canvas.data["yTurn"] = True
 				break
 		self.canvas.move(self.ball, self.canvas.data["Dir"]['x'] * self.canvas.data["Speed"], self.canvas.data["Dir"]['y'] * self.canvas.data["Speed"])
 		
