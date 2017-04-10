@@ -14,6 +14,7 @@ import random
 import time
 import math
 from shapely.geometry import Polygon, Point, box
+import winsound
 
 FRAME_RATE = 10 # 100 frames per second 
 #HEIGHT = 310
@@ -24,6 +25,7 @@ class game_controller(object):
 		if var == "ai":
 			self.canvas.data["AiScore"] += 1
 			self.canvas.itemconfig(self.aiScore, text=self.canvas.data["AiScore"])
+			winsound.PlaySound("ping_pong_8bit_peeeeeep.wav", winsound.SND_ALIAS|winsound.SND_ASYNC)
 			if self.canvas.data["AiScore"] >= self.currentScoreVar:
 				print("Player lose")
 			else:
@@ -31,11 +33,13 @@ class game_controller(object):
 				self.set_ball_dir()
 				self.set_diff()
 				self.canvas.data["play"] = True
+				self.roundWin = None
 				self.root.after(2000, self.moveit)		
 				
 		elif var == "player":
 			self.canvas.data["PlayerScore"] += 1
 			self.canvas.itemconfig(self.playerScore, text=self.canvas.data["PlayerScore"])
+			winsound.PlaySound("ping_pong_8bit_peeeeeep.wav", winsound.SND_ALIAS|winsound.SND_ASYNC)
 			if self.canvas.data["PlayerScore"] >= self.currentScoreVar:
 				print("Player win")
 			else:
@@ -43,7 +47,11 @@ class game_controller(object):
 				self.set_ball_dir()
 				self.set_diff()
 				self.canvas.data["play"] = True
-				self.root.after(2000, self.moveit)		
+				self.roundWin = None
+				
+				self.root.after(2000, self.moveit)	
+		elif self.roundWin == None:
+			pass
 				
 	def set_ball(self):
 		rand_pos = random.randint(50,250)
@@ -139,14 +147,12 @@ class game_controller(object):
 			self.canvas.data["play"] = False
 			self.roundWin = "ai"
 			
-			#print("Player lose")
-			
 		elif self.canvas.coords(self.ball)[2] > 450 and self.canvas.data["Dir"]['x'] > 0:
 			self.canvas.data["play"] = False
 			self.roundWin = "player"
-			#print("Player win")	
 	
 	def moveit(self):
+	
 		self.ai()
 		self.win_lose()	
 
@@ -168,12 +174,14 @@ class game_controller(object):
 					else:
 						self.angle = random.uniform(0.5, math.pi/2)
 					
-					if i[0] < 30:
-						self.angle += math.pi
+#					if i[0] < 30:
+#						self.angle += math.pi
 					
 					self.canvas.data["Dir"] = {'x': math.sin(self.angle), 'y': -math.cos(self.angle)}
 	
 					self.canvas.data["Speed"] += 1
+					
+					winsound.PlaySound("ping_pong_8bit_beeep.wav", winsound.SND_ALIAS|winsound.SND_ASYNC)
 					break
 			elif box( self.canvas.coords(self.rect2)[0], self.canvas.coords(self.rect2)[1],self.canvas.coords(self.rect2)[2],self.canvas.coords(self.rect2)[3] ).intersects(Point( self.canvas.coords(self.ball)[0] + 10, self.canvas.coords(self.ball)[1] + 10 ).buffer(10)) and self.canvas.data["Dir"]['x'] > 0:
 				if self.canvas.coords(self.rect2)[1] <  i[3] and self.canvas.coords(self.rect2)[3] > i[1]:
@@ -183,19 +191,23 @@ class game_controller(object):
 					else:
 						self.angle = random.uniform(math.pi * 1.5, math.pi * 2 - 0.5)
 					
-					if i[2] > 420:
-						self.angle += math.pi
+#					if i[2] > 420:
+#						self.angle += math.pi
 					
 					self.canvas.data["Dir"] = {'x': math.sin(self.angle), 'y': -math.cos(self.angle)}
 					
 					self.canvas.data["Speed"] += 1
+					
+					winsound.PlaySound("ping_pong_8bit_beeep.wav", winsound.SND_ALIAS|winsound.SND_ASYNC)
 					break
 
 			elif i[1] < 10 and self.canvas.data["Dir"]['y'] < 0:
 				self.canvas.data["Dir"]['y'] *= -1
+				winsound.PlaySound("ping_pong_8bit_plop.wav", winsound.SND_ALIAS|winsound.SND_ASYNC)
 				break
 			elif i[3] > 300 and self.canvas.data["Dir"]['y'] > 0:
 				self.canvas.data["Dir"]['y'] *= -1
+				winsound.PlaySound("ping_pong_8bit_plop.wav", winsound.SND_ALIAS|winsound.SND_ASYNC)
 				break
 		self.canvas.move(self.ball, self.canvas.data["Dir"]['x'] * self.canvas.data["Speed"], self.canvas.data["Dir"]['y'] * self.canvas.data["Speed"])
 		
@@ -206,8 +218,6 @@ class game_controller(object):
 			self.canvas.data["play"] = None
 			self.set_score(self.roundWin)
 			
-			
-		
 	def mouseMoved(self, event):
 		if self.canvas.data["play"]:
 			if event.y <= 60:
@@ -263,6 +273,7 @@ class game_controller(object):
 		self.canvas.bind("<Motion>", self.mouseMoved)
 		self.canvas.data = { }
 		self.canvas.data["play"] = None
+		
 		
 		self.midLine = self.canvas.create_line(245, 0, 245, 310, fill="white", dash=(200, 255), width=2)
 		
